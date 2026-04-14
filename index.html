@@ -1,0 +1,91 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Livercol Reminder</title>
+</head>
+<body style="font-family: Arial; text-align: center; padding: 40px; direction: rtl;">
+  <h2>تذكير دواء Livercol</h2>
+  <p>سيتم تحميل ملف التذكير تلقائياً...</p>
+
+  <script>
+    function formatDateICS(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hour = String(date.getHours()).padStart(2, '0');
+      const minute = String(date.getMinutes()).padStart(2, '0');
+      const second = "00";
+      return `${year}${month}${day}T${hour}${minute}${second}`;
+    }
+
+    function generateICS() {
+      const now = new Date();
+
+      // Reminder time 10:00 PM
+      const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 22, 0, 0);
+
+      // Day 27 (after 26 days)
+      const day27 = new Date(startDate);
+      day27.setDate(day27.getDate() + 26);
+
+      // Day 28 (after 27 days)
+      const day28 = new Date(startDate);
+      day28.setDate(day28.getDate() + 27);
+
+      const dtstamp = formatDateICS(new Date());
+
+      return `BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//Medication Reminder//Livercol//EN
+
+BEGIN:VEVENT
+UID:livercol-main-${Date.now()}@example.com
+DTSTAMP:${dtstamp}
+SUMMARY:Livercol - حان موعد علاج الدهون
+DTSTART:${formatDateICS(startDate)}
+DTEND:${formatDateICS(startDate)}
+RRULE:FREQ=DAILY;COUNT=26
+DESCRIPTION:حان موعد علاج الدهون - Livercol
+END:VEVENT
+
+BEGIN:VEVENT
+UID:livercol-day27-${Date.now()}@example.com
+DTSTAMP:${dtstamp}
+SUMMARY:Livercol - تبقت حبة واحدة لا تنسى شراء علاج الدهون من اقرب صيدلية
+DTSTART:${formatDateICS(day27)}
+DTEND:${formatDateICS(day27)}
+DESCRIPTION:تبقت حبة واحدة لا تنسى شراء علاج الدهون من اقرب صيدلية
+END:VEVENT
+
+BEGIN:VEVENT
+UID:livercol-lastday-${Date.now()}@example.com
+DTSTAMP:${dtstamp}
+SUMMARY:Livercol - حان موعد علاج الدهون (اليوم الأخير)
+DTSTART:${formatDateICS(day28)}
+DTEND:${formatDateICS(day28)}
+DESCRIPTION:حان موعد علاج الدهون - Livercol (اليوم الأخير)
+END:VEVENT
+
+END:VCALENDAR`;
+    }
+
+    function autoDownload() {
+      const icsContent = generateICS();
+      const blob = new Blob([icsContent], { type: "text/calendar" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Livercol_Reminder.ics";
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Auto download when page opens
+    window.onload = autoDownload;
+  </script>
+</body>
+</html>
